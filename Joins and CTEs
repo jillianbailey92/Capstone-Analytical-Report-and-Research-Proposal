@@ -1,0 +1,30 @@
+SELECT weather.events, weather.zip, trips.duration, trips.zip_code
+FROM weather JOIN trips
+ON weather.zip = trips.zip_code
+WHERE weather.events = 'Rain'
+ORDER BY duration DESC
+LIMIT 3;
+
+SELECT stations.station_id, stations.name, COUNT(CASE WHEN docks_available = 0 THEN 1 END) empty_count
+FROM stations JOIN status
+ON stations.station_id = status.station_id
+GROUP BY stations.station_id, stations.name
+ORDER BY empty_count DESC; --Santa Clara at Almaden is full most often
+
+SELECT trips.start_station, stations.dockcount, COUNT(trips.start_station)
+FROM trips JOIN stations
+ON trips.start_station = stations.name
+GROUP BY trips.start_station, stations.dockcount
+ORDER BY stations.dockcount;
+
+WITH rainy_days as (
+	SELECT weather.date, MAX(trips.duration) as duration, weather.events
+	FROM trips JOIN weather
+	ON weather.date = SUBSTRING(trips.start_date, 1, 10)
+	WHERE weather.events = 'Rain'
+	GROUP BY weather.date, duration, weather.events
+	)
+	SELECT rainy_days.date, MAX(duration)
+	FROM rainy_days
+	GROUP BY rainy_days.date
+	ORDER BY MAX(duration);
