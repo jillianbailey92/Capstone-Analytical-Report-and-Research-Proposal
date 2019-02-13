@@ -1,0 +1,46 @@
+SELECT listing_id, MAX(price)
+FROM sfo_calendar
+WHERE price != ''
+GROUP BY listing_id, price
+ORDER BY price DESC; -- Room ID 22653727 costs $9,999.00 a night on the calendar. However on the listing it says $600 a night.
+
+SELECT id, MAX(price)
+FROM sfo_listings
+GROUP BY id, price
+ORDER BY price DESC; -- Room ID 24650875 costs $10,000.00 a night on the listing and around $10,000.00 a night on the calendar.
+
+SELECT id, price, minimum_nights, (price * minimum_nights) as minimum_total
+FROM sfo_listings
+ORDER BY minimum_total DESC; 
+-- When you take into account the minimum number of nights times the cost per day on the listing
+-- the most expensive place changes. Although one of the listings had 1000000 as their minimum number of days.
+
+SELECT neighbourhood, AVG(price)
+FROM sfo_listings
+GROUP BY neighbourhood
+ORDER BY AVG(price) DESC;
+-- Western Addition has the most expensive place,
+-- but on average Seacliff is the most expensive neighbourhood.
+
+SELECT room_type, AVG(price)
+FROM sfo_listings
+GROUP BY room_type
+ORDER BY AVG(price) DESC; -- Entire home/apt is most expensive type of room.
+
+SELECT neighbourhood, MAX(availability_365) AS availability, SUM(number_of_reviews) AS total_reviews, COUNT(*)
+FROM sfo_listings
+GROUP BY neighbourhood
+ORDER BY SUM(number_of_reviews) DESC;
+-- Mission appears to the be most popular neighbourhood with the least availability, the most reviews, and the most listings.
+
+SELECT calender_date, MIN(price)
+FROM sfo_calendar
+WHERE price != ''
+GROUP BY calender_date
+ORDER BY MIN(price); -- The winter and fall months appear to be the cheapest although it probably depends on the place.
+
+SELECT calender_date, (6529-COUNT(*)) AS number_of_unavailable
+FROM sfo_calendar
+WHERE price != ''					  
+GROUP BY calender_date
+ORDER BY number_of_unavailable; -- The winter (holiday) months appears to be the busiest.
